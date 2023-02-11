@@ -13,7 +13,7 @@ import { usersRouter } from './routes/users.js'
 export const app = express();
 // var debug = require('debug')('backend:server');
 // var http = require('http');
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8000
 
 const con = mysql.createConnection({
   host: mysqlConfig.HOST,
