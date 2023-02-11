@@ -4,10 +4,10 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import mysql from 'mysql';
 import 'dotenv/config'
+
 import { mysqlConfig } from '../config/mysql.config.js'
 import { signInRouter } from './routes/signin.js'
 import { signUpRouter } from './routes/signup.js'
-import { indexRouter } from './routes/index.js'
 import { usersRouter } from './routes/users.js'
 
 export const app = express();
@@ -33,7 +33,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/', indexRouter);
 app.use('/signin', signInRouter)
 app.use('/signup', signUpRouter)
 app.use('/users', usersRouter);
