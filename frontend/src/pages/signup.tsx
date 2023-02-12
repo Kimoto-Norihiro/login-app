@@ -3,20 +3,38 @@ import type { NextPage } from 'next'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { User } from '@/types/types'
+import { useRouter } from 'next/router'
 
-const signInSchema = yup.object().shape({
+const signUpSchema = yup.object().shape({
   name: yup.string().required('required input'),
   email: yup.string().email('invalid email').required('required input'),
   password: yup.string().required('required input').min(8, 'at least 8 characters'),
 })
 
+type signUpFormValues = User
+
 const SignUp: NextPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(signInSchema)
+  const router = useRouter()
+  const { register, handleSubmit, formState: { errors } } = useForm<signUpFormValues>({
+    resolver: yupResolver(signUpSchema)
   })
+
+  const signUp = async (user: User) => {
+    await fetch('http://localhost:8000/signup',{
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user),
+    })
+  }
+
   const submit = () => {
     handleSubmit((data) => {
       console.log(data)
+      signUp(data)
+      router.push('/signin')
     }, () => {
       console.log('error')
     })()
@@ -36,21 +54,21 @@ const SignUp: NextPage = () => {
           }}>
           <div className='flex justify-between'>
             <label>name</label>
-            <input type="text" className='border border-black rounded-lg' id='name' {...register('name',{required: true})}/>
+            <input type="text" className='border border-black rounded-lg' id='name' {...register('name')}/>
           </div>
           {
             errors['name'] ? <div className='text-red-800 text-sm'>{`${errors['name'].message}`}</div> : <div className='h-5'></div>
           }
           <div className='flex justify-between'>
             <label>email</label>
-            <input type="text" className='border border-black rounded-lg' id='email' {...register('email',{required: true})}/>
+            <input type="text" className='border border-black rounded-lg' id='email' {...register('email')}/>
           </div>
           {
             errors['email'] ? <div className='text-red-800 text-sm'>{`${errors['email'].message}`}</div> : <div className='h-5'></div>
           }
           <div className='flex justify-between'>
             <label>password</label>
-            <input type="text" className='border border-black rounded-lg' id='password' {...register('password',{required: true})}/>
+            <input type="text" className='border border-black rounded-lg' id='password' {...register('password')}/>
           </div>
           {
             errors['password'] ? <div className='text-red-800 text-sm'>{`${errors['password'].message}`}</div> : <div className='h-5'></div>
