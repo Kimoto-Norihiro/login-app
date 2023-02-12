@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import mysql from 'mysql';
 import 'dotenv/config'
+import cors from 'cors'
 
 import { mysqlConfig } from '../config/mysql.config.js'
 import { signInRouter } from './routes/signin.js'
@@ -28,6 +29,11 @@ con.connect((err) => {
   console.log('Connected')
 })
 
+const corsOptions = {
+  origin: ['http://localhost:3000']
+}
+
+app.use(cors(corsOptions))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
