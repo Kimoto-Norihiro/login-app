@@ -3,21 +3,43 @@ import type { NextPage } from 'next'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { User } from '@/types/types'
 
-const signUpSchema = yup.object().shape({
+const signInSchema = yup.object().shape({
   email: yup.string().email('invalid email').required('required input'),
   password: yup.string().required('required input').min(8, 'at least 8 characters'),
 })
 
+type signInFormValues = Omit<User, 'name'>
+
 
 const SignIn: NextPage = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(signUpSchema)
+  const { register, handleSubmit, formState: { errors } } = useForm<signInFormValues>({
+    resolver: yupResolver(signInSchema)
   });
 
+  const signIn = async (user: signInFormValues) => {
+    const response = await fetch('http://localhost:8000/signin',{
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user),
+      credentials: 'include'
+    })
+
+    const res = await response.json()
+
+    return res
+  }
+
   const submit = () => {
-    handleSubmit((data) => {
+    handleSubmit(async (data) => {
       console.log(data)
+      const res = await signIn(data)
+      const token = res.token
+      console.log(res.message)
+      console.log(token)
     }, () => {
       console.log('error')
     })()

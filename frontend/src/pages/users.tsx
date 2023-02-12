@@ -1,27 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
+import { User } from '@/types/types'
+import { parseCookies } from 'nookies'
+import { useRouter } from 'next/router'
 
-type User = {
-  name: string
-  email: string
-  password: string
+type Props = {
+  users?: User[]
+  status?: string
 }
 
-const Users: NextPage = () => {
-  const getUsers = async () => {
-    const response = await fetch("http://localhost:8000/users")
-    const res = await response.json()
-    return res
+const Users: NextPage = ({users, status}: Props) => {
+  // const getUsers = async () => {
+  //   const response = await fetch("http://localhost:8000/users")
+  //   const res = await response.json()
+  //   return res
+  // }
+
+  // const [users, setUsers] = useState<User[]>([])
+  // const [token, setToken] = useState('')
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const data = await getUsers()
+  //     setUsers(data.users)
+  //   })()
+  // },[])
+
+  if (status) {
+    console.log(status)
   }
-
-  const [users, setUsers] = useState<User[]>([])
-
-  useEffect(() => {
-    (async () => {
-      const data = await getUsers()
-      setUsers(data.users)
-    })()
-  },[])
 
   return (
     <div className='flex flex-col bg-white justify-center p-10 align-center'>
@@ -30,7 +37,7 @@ const Users: NextPage = () => {
       </div>
       <div className='flex flex-col justify-center text-2xl mt-3'>
         {
-          users.map((user, index) => (
+          users?.map((user, index) => (
             <div key={index} className='flex justify-center'>{user.name}</div>
           ))
         }
@@ -40,3 +47,22 @@ const Users: NextPage = () => {
 }
 
 export default Users
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { token } = parseCookies(context)
+  console.log('token')
+  console.log(token)
+
+  try {
+     const response = await fetch("http://localhost:8000/users", {
+      headers: {'Authorization': `Bearer: ${token}`}
+    })
+    const { users } = await response.json()
+    return { props: { users }}
+  } catch (err) {
+    if (err instanceof Error) {
+      return { props: { status: err.message }}
+    }
+    throw err
+  }
+}
