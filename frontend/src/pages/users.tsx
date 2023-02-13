@@ -3,33 +3,15 @@ import { GetServerSideProps, NextPage } from 'next'
 import { User } from '@/types/types'
 import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
+import Error from './_error'
 
 type Props = {
   users?: User[]
-  status?: string
+  status? : number
 }
 
 const Users: NextPage = ({users, status}: Props) => {
-  // const getUsers = async () => {
-  //   const response = await fetch("http://localhost:8000/users")
-  //   const res = await response.json()
-  //   return res
-  // }
-
-  // const [users, setUsers] = useState<User[]>([])
-  // const [token, setToken] = useState('')
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const data = await getUsers()
-  //     setUsers(data.users)
-  //   })()
-  // },[])
-
-  if (status) {
-    console.log(status)
-  }
-
+  if (status) return <Error statusCode={status} />
   return (
     <div className='flex flex-col bg-white justify-center p-10 align-center'>
       <div className='flex justify-center text-3xl'>
@@ -50,19 +32,24 @@ export default Users
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = parseCookies(context)
-  console.log('token')
-  console.log(token)
 
-  try {
-     const response = await fetch("http://localhost:8000/users", {
-      headers: {'Authorization': `Bearer: ${token}`}
-    })
-    const { users } = await response.json()
-    return { props: { users }}
-  } catch (err) {
-    if (err instanceof Error) {
-      return { props: { status: err.message }}
+  const response = await fetch("http://localhost:8000/users", {
+    headers: {'Authorization': `Bearer: ${token}`}
+  })
+  if (response.status!=200) {
+    const { message } = await response.json()
+    console.log(message)
+    return {
+      props: {
+        status: response.status
+      }
     }
-    throw err
+  }
+  
+  const { users } = await response.json()
+  return { 
+    props: { 
+      users 
+    },
   }
 }
