@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
+import Link from 'next/link'
 import type { NextPage } from 'next'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { User } from '@/types/types'
+import { useRouter } from 'next/router'
 
 const signInSchema = yup.object().shape({
   email: yup.string().email('invalid email').required('required input'),
@@ -14,6 +16,9 @@ type signInFormValues = Omit<User, 'name'>
 
 
 const SignIn: NextPage = () => {
+  const router = useRouter()
+  const [err, setErr] = useState('')
+
   const { register, handleSubmit, formState: { errors } } = useForm<signInFormValues>({
     resolver: yupResolver(signInSchema)
   });
@@ -29,17 +34,17 @@ const SignIn: NextPage = () => {
     })
 
     const res = await response.json()
-
     return res
   }
 
   const submit = () => {
     handleSubmit(async (data) => {
-      console.log(data)
-      const res = await signIn(data)
-      const token = res.token
-      console.log(res.message)
-      console.log(token)
+      const {message, token, result} = await signIn(data)
+      if (result) {
+        router.push('/users')
+      } else {
+        setErr(message)
+      }
     }, () => {
       console.log('error')
     })()
@@ -71,6 +76,12 @@ const SignIn: NextPage = () => {
           {
             errors['password'] ? <div className='text-red-800 text-sm'>{`${errors['password'].message}`}</div> : <div className='h-5'></div>
           }
+          {
+            err ? <div className='text-red-800 text-sm'>{err}</div> : <div className='h-5'></div>
+          }
+          <div>
+            if you don`t have account ... <Link href='signup' className='text-blue-700 underline'>signup</Link>
+          </div>
           <div className='flex justify-center mt-5'>
             <div className='bg-gray-200 py-1 px-3 rounded-lg'>
               <button type='submit'>sign in</button>
