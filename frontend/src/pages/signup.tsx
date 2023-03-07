@@ -13,7 +13,7 @@ const signUpSchema = yup.object().shape({
   password: yup.string().required('required input').min(8, 'at least 8 characters'),
 })
 
-type signUpFormValues = User
+type signUpFormValues = Omit<User, 'id'>
 
 const SignUp: NextPage = () => {
   const [err, setErr] = useState('')
@@ -22,7 +22,7 @@ const SignUp: NextPage = () => {
     resolver: yupResolver(signUpSchema)
   })
 
-  const signUp = async (user: User) => {
+  const signUp = async (user: signUpFormValues) => {
     const response = await fetch('http://localhost:8000/signup',{
       method: "POST",
       headers: {

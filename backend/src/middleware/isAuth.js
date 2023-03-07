@@ -1,19 +1,19 @@
 import 'dotenv/config'
+import jwt from 'jsonwebtoken'
 
-const isAuth = (req, res, next) => {
-	const authHeader = req.get('Authorization')
-	if (!authHeader) {
-		const error = new Error('NotAuthenticated')
-		error.statuscode = 401
-		throw error
-	}
-	const token = authHeader.split(' ')[1]
-	let decodedToken;
+export const isAuth = (req, res, next) => {
   try {
-    decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    console.log('success')
+    const authHeader = req.get('Authorization')
+    const token = authHeader.split(' ')[1]
+    jwt.verify(token, process.env.SECRET_KEY);
+    
   } catch (err) {
-    err.statusCode = 500;
-    throw err;
+    console.log(err)
+    return res.status(401).json({
+      result: false,
+      message: 'AUTH ERROR'
+    })
   }
   next();
 }

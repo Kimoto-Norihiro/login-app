@@ -10,6 +10,8 @@ import { mysqlConfig } from '../config/mysql.config.js'
 import { signInRouter } from './routes/signin.js'
 import { signUpRouter } from './routes/signup.js'
 import { usersRouter } from './routes/users.js'
+import { myPageRouter } from './routes/mypage.js';
+import { isAuth } from './middleware/isAuth.js';
 
 export const app = express();
 // var debug = require('debug')('backend:server');
@@ -42,7 +44,8 @@ app.use(cookieParser());
 
 app.use('/signin', signInRouter)
 app.use('/signup', signUpRouter)
-app.use('/users', usersRouter);
+app.use('/users', usersRouter)
+app.use('/mypage', myPageRouter)
 
 app.listen(PORT, () => {
 	console.log(`listening at ${PORT}`)
