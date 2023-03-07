@@ -37,8 +37,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     headers: {'Authorization': `Bearer: ${token}`}
   })
   if (response.status!=200) {
-    const { message } = await response.json()
-    console.log(message)
+    console.log(response)
+    // const res = await response.json()
+    // console.log(res)
     return {
       props: {
         status: response.status

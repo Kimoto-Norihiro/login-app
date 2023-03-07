@@ -24,24 +24,32 @@ const SignIn: NextPage = () => {
   });
 
   const signIn = async (user: signInFormValues) => {
-    const response = await fetch('http://localhost:8000/signin',{
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user),
-      credentials: 'include'
-    })
-
-    const res = await response.json()
-    return res
+    try {
+      const response = await fetch('http://localhost:8000/signin',{
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user),
+        credentials: 'include'
+      })
+      const res = await response.json()
+      return res
+    } catch (err) {
+      if (err instanceof Error) {
+        return {
+          message: err.message,
+          result: false
+        }
+      }
+    }
   }
 
   const submit = () => {
     handleSubmit(async (data) => {
       const {message, token, result} = await signIn(data)
       if (result) {
-        router.push('/users')
+        router.push('/mypage')
       } else {
         setErr(message)
       }
@@ -62,14 +70,14 @@ const SignIn: NextPage = () => {
           e.preventDefault()
           submit()
         }}>
-          <div className='flex justify-between'>
+          <div className='flex justify-between align-center'>
             <label>email</label>
             <input type="text" className='border border-black rounded-lg' id='email' {...register('email',{required: true})}/>
           </div>
           {
             errors['email'] ? <div className='text-red-800 text-sm'>{`${errors['email'].message}`}</div> : <div className='h-5'></div>
           }
-          <div className='flex justify-between'>
+          <div className='flex justify-between align-center'>
             <label>password</label>
             <input type="text" className='border border-black rounded-lg' id='password' {...register('password',{required: true})}/>
           </div>
