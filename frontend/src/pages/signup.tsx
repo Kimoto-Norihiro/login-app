@@ -6,6 +6,8 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { User } from '@/types/types'
 import { useRouter } from 'next/router'
+import axios from 'axios'
+import { InputWithError } from '@/components/InputWithError'
 
 const signUpSchema = yup.object().shape({
   name: yup.string().required('required input'),
@@ -13,30 +15,22 @@ const signUpSchema = yup.object().shape({
   password: yup.string().required('required input').min(8, 'at least 8 characters'),
 })
 
-type signUpFormValues = Omit<User, 'id'>
+export type SignUpFormValues = Omit<User, 'id'>
 
 const SignUp: NextPage = () => {
   const [err, setErr] = useState('')
   const router = useRouter()
-  const { register, handleSubmit, formState: { errors } } = useForm<signUpFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormValues>({
     resolver: yupResolver(signUpSchema)
   })
 
-  const signUp = async (user: signUpFormValues) => {
-    const response = await fetch('http://localhost:8000/signup',{
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user),
-    })
-    const res = await response.json()
-    return res
+  const signUp = async (user: SignUpFormValues) => {
+    const response = await axios.post('http://localhost:8000/signup', user)
+    return response.data
   }
 
   const submit = () => {
     handleSubmit(async (data) => {
-      console.log(data)
       const { result, message } = await signUp(data)
       if (result) {
         router.push('/signin')
@@ -60,27 +54,21 @@ const SignUp: NextPage = () => {
             e.preventDefault()
             submit()
           }}>
-          <div className='flex justify-between'>
-            <label>name</label>
-            <input type="text" className='border border-black rounded-lg' id='name' {...register('name')}/>
-          </div>
-          {
-            errors['name'] ? <div className='text-red-800 text-sm'>{`${errors['name'].message}`}</div> : <div className='h-5'></div>
-          }
-          <div className='flex justify-between'>
-            <label>email</label>
-            <input type="text" className='border border-black rounded-lg' id='email' {...register('email')}/>
-          </div>
-          {
-            errors['email'] ? <div className='text-red-800 text-sm'>{`${errors['email'].message}`}</div> : <div className='h-5'></div>
-          }
-          <div className='flex justify-between'>
-            <label>password</label>
-            <input type="text" className='border border-black rounded-lg' id='password' {...register('password')}/>
-          </div>
-          {
-            errors['password'] ? <div className='text-red-800 text-sm'>{`${errors['password'].message}`}</div> : <div className='h-5'></div>
-          }
+          <InputWithError 
+            name='name'
+            register={register}
+            errors={errors}
+          />
+          <InputWithError 
+            name='email'
+            register={register}
+            errors={errors}
+          />
+          <InputWithError 
+            name='password'
+            register={register}
+            errors={errors}
+          />
           {
             err ? <div className='text-red-800 text-sm'>{err}</div> : <div className='h-5'></div>
           }
