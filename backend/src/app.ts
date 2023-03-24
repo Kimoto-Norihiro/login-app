@@ -12,8 +12,6 @@ import { usersRouter } from './routes/users'
 import { myPageRouter } from './routes/mypage';
 
 export const app = express();
-// var debug = require('debug')('backend:server');
-// var http = require('http');
 const PORT = process.env.PORT || 8000
 
 const con = mysql.createConnection({
