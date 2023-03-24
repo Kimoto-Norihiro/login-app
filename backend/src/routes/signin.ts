@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Router } from 'express';
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import jwt, { Secret } from 'jsonwebtoken'
 
 const prisma = new PrismaClient()
 export const signInRouter = Router();
@@ -15,6 +15,8 @@ signInRouter.post('/', async (req, res) => {
         email
       }
     })
+    console.log(user)
+    if (!user) return
     bcrypt.compare(password, user.password, (error, results) => {
       if (error) {
         return res.status(400).json({
@@ -32,7 +34,7 @@ signInRouter.post('/', async (req, res) => {
           name: user.name,
           email: user.email,
         }
-        const token = jwt.sign(payload, process.env.SECRET_KEY, {
+        const token = jwt.sign(payload, process.env.SECRET_KEY as Secret, {
           algorithm: 'HS256',
           expiresIn: '100s',
         })
