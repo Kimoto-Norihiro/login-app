@@ -1,12 +1,14 @@
 import 'dotenv/config'
-import jwt from 'jsonwebtoken'
+import { NextFunction, Request, Response } from 'express'
+import jwt, { Secret } from 'jsonwebtoken'
 
-export const isAuth = (req, res, next) => {
+export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log('success')
     const authHeader = req.get('Authorization')
+    if (!authHeader) return
     const token = authHeader.split(' ')[1]
-    jwt.verify(token, process.env.SECRET_KEY);
+    jwt.verify(token, process.env.SECRET_KEY as Secret);
     
   } catch (err) {
     console.log(err)

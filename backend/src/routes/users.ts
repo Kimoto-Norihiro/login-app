@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { Router } from 'express';
-import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import { isAuth } from '../middleware/isAuth.js';
 
@@ -14,7 +13,7 @@ usersRouter.get('/', async (req, res) => {
     return res.json({
       users,
     })
-  } catch (err) {
+  } catch (err: any) {
     return res.status(500).json({
       message: err.message
     })

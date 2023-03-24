@@ -1,26 +1,22 @@
 import express from 'express'
-import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import mysql from 'mysql';
 import 'dotenv/config'
 import cors from 'cors'
 
-import { mysqlConfig } from '../config/mysql.config.js'
-import { signInRouter } from './routes/signin.js'
-import { signUpRouter } from './routes/signup.js'
-import { usersRouter } from './routes/users.js'
-import { myPageRouter } from './routes/mypage.js';
-import { isAuth } from './middleware/isAuth.js';
+import { mysqlConfig } from '../config/mysql.config'
+import { signInRouter } from './routes/signin'
+import { signUpRouter } from './routes/signup'
+import { usersRouter } from './routes/users'
+import { myPageRouter } from './routes/mypage';
 
 export const app = express();
-// var debug = require('debug')('backend:server');
-// var http = require('http');
 const PORT = process.env.PORT || 8000
 
 const con = mysql.createConnection({
   host: mysqlConfig.HOST,
-  port: mysqlConfig.PORT,
+  port: Number(mysqlConfig.PORT),
   user: mysqlConfig.USERNAME,
   password: mysqlConfig.PASSWORD,
   database: mysqlConfig.DATABASE
