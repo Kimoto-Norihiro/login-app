@@ -3,6 +3,7 @@ import React from 'react'
 import { parseCookies } from 'nookies'
 import { User } from '@/types/types'
 import { useRouter } from 'next/router'
+import axios from 'axios'
 
 type Props = {
   user: User
@@ -43,12 +44,11 @@ const MyPage: NextPage<Props> = ({user}: Props) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { token } = parseCookies(context)
 
-  const response = await fetch('http://localhost:8000/mypage', {
-    method: "GET",
+  const response = await axios.get('http://localhost:8000/mypage', {
     headers: {'Authorization': `Bearer: ${token}`}
   })
-  const res = await response.json()
-  const { result, message, user } = res
+  const { result, message, user } = response.data
+  
   if (!result) {
     return {
       redirect: {

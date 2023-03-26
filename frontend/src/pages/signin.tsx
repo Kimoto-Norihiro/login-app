@@ -6,6 +6,8 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { User } from '@/types/types'
 import { useRouter } from 'next/router'
+import axios from 'axios'
+import { InputWithError } from '../components/InputWithError';
 
 const signInSchema = yup.object().shape({
   email: yup.string().email('invalid email').required('required input'),
@@ -25,16 +27,11 @@ const SignIn: NextPage = () => {
 
   const signIn = async (user: signInFormValues) => {
     try {
-      const response = await fetch('http://localhost:8000/signin',{
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(user),
-        credentials: 'include'
-      })
-      const res = await response.json()
-      return res
+      const response = await axios.post('http://localhost:8000/signin', user, { 
+          withCredentials: true 
+        }
+      )
+      return response.data
     } catch (err) {
       if (err instanceof Error) {
         return {
@@ -48,6 +45,7 @@ const SignIn: NextPage = () => {
   const submit = () => {
     handleSubmit(async (data) => {
       const {message, token, result} = await signIn(data)
+      console.log(result)
       if (result) {
         router.push('/mypage')
       } else {
@@ -70,20 +68,16 @@ const SignIn: NextPage = () => {
           e.preventDefault()
           submit()
         }}>
-          <div className='flex justify-between align-center'>
-            <label>email</label>
-            <input type="text" className='border border-black rounded-lg' id='email' {...register('email',{required: true})}/>
-          </div>
-          {
-            errors['email'] ? <div className='text-red-800 text-sm'>{`${errors['email'].message}`}</div> : <div className='h-5'></div>
-          }
-          <div className='flex justify-between align-center'>
-            <label>password</label>
-            <input type="text" className='border border-black rounded-lg' id='password' {...register('password',{required: true})}/>
-          </div>
-          {
-            errors['password'] ? <div className='text-red-800 text-sm'>{`${errors['password'].message}`}</div> : <div className='h-5'></div>
-          }
+          <InputWithError 
+            name='email'
+            register={register}
+            errors={errors}
+          />
+          <InputWithError 
+            name='password'
+            register={register}
+            errors={errors}
+          />
           {
             err ? <div className='text-red-800 text-sm'>{err}</div> : <div className='h-5'></div>
           }
